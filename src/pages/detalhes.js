@@ -1,84 +1,61 @@
-import React from 'react';
-import Title from './../components/Title/index';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import CommentList from "../components/Comments/commentList";
 
-const filmes = [{
-    "nome": "Vingadores",
-    "duracao": "2H30",
-    "genero": "Ação/Nerd",
-    "descricao": "Filme da Marvel com super-heróis",
-    "nota": 5,
-    "imagem": "/assets/images/vingadores.png"
-},
-{
-    "nome": "Vingadores 2",
-    "duracao": "2H30",
-    "genero": "Ação/Nerd",
-    "descricao": "Filme da Marvel com super-heróis",
-    "nota": 6,
-    "imagem": "/assets/images/vingadores.png"
-},
-{
-    "nome": "Vingadores 3",
-    "duracao": "2H30",
-    "genero": "Ação/Nerd",
-    "descricao": "Filme da Marvel com super-heróis",
-    "nota": 7,
-    "imagem": "/assets/images/vingadores.png"
-}
-]
+function Detalhes(props) {
+  const { id } = props;
+  const [movie, setMovie] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [comments, setComentarios] = useState([]);
 
-function Detalhes() {
-    const { filme } = useParams();
+  useEffect(() => {
+    fetch(`https://my-json-server.typicode.com/marycamila184/movies/movies/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setMovie(data);
+        setIsLoading(false);
+      });
+      
+    fetch(`https://my-json-server.typicode.com/marycamila184/movies/movies/${id}/comentarios`)
+      .then((response) => response.json())
+      .then((data) => {
+        setComentarios(data);
+      });
+  }, [id]);
 
-    return (
-        <div className="container">
-            <Title
-                title={"Detalhes"}
-                text="" /> 
-            <div className="row">
-                <div className="col d-flex justify-content-center">
-                    <img src={filmes.find(f => f.nome === filme)?.imagem} alt={filme} style={{ maxWidth: '50%', marginLeft: 'auto', marginRight: 'auto' }} />
-                </div>
-                <div className="col">
-                    <p>Filme: {filme}</p>
-                    {(() => {
-                        if (filme === 'Vingadores') {
-                            return (
-                                <div>
-                                    <p>{filmes[0].nome}</p>
-                                    <p>{filmes[0].duracao}</p>
-                                    <p>{filmes[0].genero}</p>
-                                    <p>Sinopse</p>
-                                    <p>{filmes[0].nota}</p>
-                                </div>
-                            )
-                        } else if (filme == 'Vingadores 2') {
-                            return (
-                                <div>
-                                    <p>{filmes[1].nome}</p>
-                                    <p>{filmes[1].duracao}</p>
-                                    <p>{filmes[1].genero}</p>
-                                    <p>Sinopse</p>
-                                    <p>{filmes[1].nota}</p>
-                                </div>
-                            )
-                        } else {
-                            return (
-                                <div>
-                                    <p>{filmes[2].nome}</p>
-                                    <p>{filmes[2].duracao}</p>
-                                    <p>{filmes[2].genero}</p>
-                                    <p>Sinopse</p>
-                                    <p>{filmes[2].nota}</p>
-                                </div>
-                            )
-                        }
-                    })()}
-                </div>
+  return (
+    <div className="container">
+      {isLoading ? (
+        <h1>Carregando Detalhes...</h1>
+      ) : (
+        <>
+          <div className="row">
+            <div className="col d-flex justify-content-center">
+              <img
+                src={movie.poster}
+                alt={movie.titulo}
+                style={{ maxWidth: "50%", marginLeft: "auto", marginRight: "auto" }}
+              />
             </div>
-        </div>
-    )
+            <div className="col">
+              <h1>Título: {movie.titulo}</h1>
+              <p>Ano: {movie.ano}</p>
+              <p>Nota: {movie.nota}</p>
+              <p>Sinopse: {movie.sinopse}</p>
+              <Link to="/">
+                <button variant="primary">Voltar</button>
+              </Link>
+            </div>
+          </div>
+          <div>
+            <h2>Comentários:</h2>
+            <CommentList filmeId={id} />
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 export default Detalhes;
+
